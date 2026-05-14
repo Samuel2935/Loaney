@@ -36,4 +36,10 @@ export class Loan {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  dueDate!: Date;
 }

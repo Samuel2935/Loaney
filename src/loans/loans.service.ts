@@ -25,10 +25,15 @@ export class LoansService {
       throw new NotFoundException('User not found');
     }
 
+    //schedule a job to check for overdue loans after 30 days
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 30);
+
     const loan = this.loanRepository.create({
       amount,
       status: LoanStatus.PENDING,
       user,
+      dueDate,
     });
 
     await this.loanRepository.save(loan);
@@ -37,6 +42,19 @@ export class LoansService {
       message: 'Loan request submitted',
       loan,
     };
+  }
+
+  //   loan overdue query
+  async findOverdueLoans() {
+    return this.loanRepository
+      .createQueryBuilder('loan')
+      .where('loan.status = :status', {
+        status: LoanStatus.APPROVED,
+      })
+      .andWhere('loan.dueDate < :today', {
+        today: new Date(),
+      })
+      .getMany();
   }
 
   async findByUserId(userId: string) {
@@ -90,5 +108,25 @@ export class LoansService {
       message: 'Loan rejected',
       loan,
     };
+  }
+
+  async markAsOverdue(id: string) {
+    const loan = await this.findOne(id);
+
+    loan.status = LoanStatus.OVERDUE;
+
+    await this.loanRepository.save(loan);
+
+    return loan;
+  }
+
+  async markAsPaid(id: string) {
+    const loan = await this.findOne(id);
+
+    loan.status = LoanStatus.PAID;
+
+    await this.loanRepository.save(loan);
+
+    return loan;
   }
 }
