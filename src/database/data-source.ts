@@ -1,21 +1,17 @@
-import 'dotenv/config';
-import { DataSource } from 'typeorm';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 
-import { User } from '../users/entities/user.entity';
-import { Loan } from '../loans/entities/loan.entity';
-
-export default new DataSource({
+export const getTypeOrmConfig = (
+  configService: ConfigService,
+): TypeOrmModuleOptions => ({
   type: 'postgres',
 
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT) || 5432,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+  host: configService.get<string>('DB_HOST'),
+  port: Number(configService.get<string>('DB_PORT')) || 5432,
+  username: configService.get<string>('DB_USER'),
+  password: configService.get<string>('DB_PASS'),
+  database: configService.get<string>('DB_NAME'),
 
-  entities: [User, Loan],
-
-  migrations: ['src/database/migrations/*.ts'],
-
+  autoLoadEntities: true,
   synchronize: false,
 });

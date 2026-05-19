@@ -5,18 +5,46 @@ import {
   Headers,
   Req,
   BadRequestException,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 
+import type { Request } from 'express';
 import * as crypto from 'crypto';
 
 import { PaymentsService } from './payments.service';
 import { InitializePaymentDto } from './dto/initialize-payment.dto';
 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiHeader,
+} from '@nestjs/swagger';
+
+@ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post('initialize')
+  @ApiOperation({
+    summary: 'Initialize Paystack payment',
+    description:
+      'Creates a Paystack payment transaction and returns authorization URL',
+  })
+  @ApiBody({
+    type: InitializePaymentDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment initialized successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid request payload',
+  })
   initialize(
     @Body()
     body: InitializePaymentDto,
@@ -29,8 +57,26 @@ export class PaymentsController {
   }
 
   @Post('webhook')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Paystack webhook endpoint',
+    description: 'Receives webhook events from Paystack',
+  })
+  @ApiHeader({
+    name: 'x-paystack-signature',
+    required: true,
+    description: 'Paystack signature hash',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Webhook received successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid webhook signature',
+  })
   async webhook(
-    @Req() req: any,
+    @Req() req: Request,
     @Headers('x-paystack-signature')
     signature: string,
   ) {
@@ -38,7 +84,6 @@ export class PaymentsController {
 
     const hash = crypto
       .createHmac('sha512', secret)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       .update(JSON.stringify(req.body))
       .digest('hex');
 
@@ -46,15 +91,15 @@ export class PaymentsController {
       throw new BadRequestException('Invalid webhook signature');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const event = req.body;
+    const event = req.body as {
+      event: string;
+      data: {
+        reference: string;
+      };
+    };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (event.event === 'charge.success') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      const reference = event.data.reference;
-
-      await this.paymentsService.verify(reference);
+      await this.paymentsService.verify(event.data.reference);
     }
 
     return {

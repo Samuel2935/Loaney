@@ -1,4 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -7,14 +11,12 @@ import { User, UserRole } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  findAll() {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
 
+  // CREATE USER
   async create(fullName: string, email: string, password: string) {
     const existingUser = await this.userRepository.findOne({
       where: { email },
@@ -33,23 +35,45 @@ export class UsersService {
       role: UserRole.USER,
     });
 
-    await this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    // remove password before returning
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...safeUser } = savedUser;
 
     return {
       message: 'User created successfully',
-      user,
+      user: safeUser,
     };
   }
 
+  // GET ALL USERS
+  async findAll() {
+    const users = await this.userRepository.find();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return users.map(({ password, ...user }) => user);
+  }
+
+  // GET USER BY EMAIL
   async findByEmail(email: string) {
     return this.userRepository.findOne({
       where: { email },
     });
   }
 
+  // GET USER BY ID
   async findById(id: string) {
-    return this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...safeUser } = user;
+    return safeUser;
   }
 }

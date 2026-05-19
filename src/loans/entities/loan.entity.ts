@@ -1,29 +1,51 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import { ApiProperty } from '@nestjs/swagger';
 
 import { User } from '../../users/entities/user.entity';
 
 export enum LoanStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  PAID = 'paid',
-  OVERDUE = 'overdue',
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  OVERDUE = 'OVERDUE',
+  PAID = 'PAID',
 }
 
-@Entity('loans')
+@Entity()
 export class Loan {
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @ApiProperty({
+    example: 50000,
+  })
   @Column('decimal')
   amount!: number;
 
+  @ApiProperty({
+    example: 12,
+  })
+  @Column()
+  durationMonths1!: number;
+
+  @ApiProperty({
+    example: 'Business expansion',
+  })
+  @Column()
+  purpose!: string;
+
+  @ApiProperty({
+    enum: LoanStatus,
+    example: LoanStatus.PENDING,
+  })
   @Column({
     type: 'enum',
     enum: LoanStatus,
@@ -34,12 +56,10 @@ export class Loan {
   @ManyToOne(() => User)
   user!: User;
 
+  @ApiProperty()
   @CreateDateColumn()
   createdAt!: Date;
-
-  @Column({
-    type: 'timestamp',
-    nullable: true,
-  })
+  @ApiProperty()
+  @Column()
   dueDate!: Date;
 }

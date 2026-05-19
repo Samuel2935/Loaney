@@ -6,27 +6,43 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
+
 export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
+  USER = 'USER',
+  ADMIN = 'ADMIN',
 }
 
-@Entity('users')
+@Entity()
 export class User {
+  @ApiProperty({
+    example: 'b7e5b4b2-70d7-4a48-b4ea-0f79df6d71e',
+  })
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @ApiProperty({
+    example: 'Samuel Dev',
+  })
   @Column()
   fullName!: string;
 
-  @Column({
-    unique: true,
+  @ApiProperty({
+    example: 'samuel@mail.com',
   })
+  @Column({ unique: true })
   email!: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  @Exclude()
   @Column()
   password!: string;
 
+  @ApiProperty({
+    enum: UserRole,
+    example: UserRole.USER,
+  })
   @Column({
     type: 'enum',
     enum: UserRole,
@@ -34,14 +50,11 @@ export class User {
   })
   role!: UserRole;
 
-  @Column({
-    default: true,
-  })
-  isActive!: boolean;
-
+  @ApiProperty()
   @CreateDateColumn()
   createdAt!: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt!: Date;
 }

@@ -51,6 +51,7 @@ export class PaymentsService {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const loanId = paymentData.metadata.loanId;
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         await this.loansService.markAsPaid(loanId);
       }
 
