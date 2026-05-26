@@ -50,13 +50,9 @@ export class LoansController {
     status: 401,
     description: 'Unauthorized',
   })
-  requestLoan(
-    @Req() req: Request & { user: { id: string } },
-
-    @Body()
-    body: CreateLoanDto,
-  ) {
-    return this.loansService.create(req.user.id, body.amount);
+  requestLoan(@Req() req, @Body() body: CreateLoanDto) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    return this.loansService.create(req.user.id, body);
   }
 
   // User gets all personal loans

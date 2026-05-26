@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-// import { typeOrmConfig } from './database/typeorm.config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { LoansModule } from './loans/loans.module';
@@ -17,21 +16,12 @@ import { getTypeOrmConfig } from './database/data-source';
       envFilePath: '.env',
     }),
 
-    // TypeOrmModule.forRoot(typeOrmConfig),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        getTypeOrmConfig(configService),
-    }),
+    TypeOrmModule.forRoot(getTypeOrmConfig()),
 
     UsersModule,
-
     AuthModule,
-
     LoansModule,
-
     PaymentsModule,
-
     JobsModule,
     ScheduleModule.forRoot(),
   ],

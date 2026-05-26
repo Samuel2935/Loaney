@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Loan, LoanStatus } from './entities/loan.entity';
 
 import { User } from '../users/entities/user.entity';
+import { CreateLoanDto } from './dto/create-loan.dto';
 
 @Injectable()
 export class LoansService {
@@ -16,21 +17,20 @@ export class LoansService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(userId: string, amount: number) {
+  async create(userId: string, body: CreateLoanDto) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    if (!user) throw new NotFoundException('User not found');
 
-    //schedule a job to check for overdue loans after 30 days
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 30);
+    dueDate.setDate(dueDate.getDate() + body.durationMonths * 30);
 
     const loan = this.loanRepository.create({
-      amount,
+      amount: body.amount,
+      durationMonths: body.durationMonths,
+      purpose: body.purpose,
       status: LoanStatus.PENDING,
       user,
       dueDate,

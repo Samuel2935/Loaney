@@ -34,7 +34,7 @@ export class Loan {
     example: 12,
   })
   @Column()
-  durationMonths1!: number;
+  durationMonths!: number;
 
   @ApiProperty({
     example: 'Business expansion',
