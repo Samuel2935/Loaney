@@ -25,6 +25,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { LoansService } from './loans.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateLoanDto } from './dto/create-loan.dto';
+import { UserRole } from 'src/users/entities/user.entity';
 
 @ApiTags('Loans')
 @ApiBearerAuth()
@@ -102,11 +103,11 @@ export class LoansController {
 
   // Admin approve loan
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @Patch(':id/approve')
   @ApiOperation({
     summary: 'Approve loan',
-    description: 'Admin endpoint for approving loan requests',
+    description: 'ADMIN endpoint for approving loan requests',
   })
   @ApiParam({
     name: 'id',
@@ -129,11 +130,11 @@ export class LoansController {
 
   // Admin reject loan
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @Patch(':id/reject')
   @ApiOperation({
     summary: 'Reject loan',
-    description: 'Admin endpoint for rejecting loan requests',
+    description: 'ADMIN endpoint for rejecting loan requests',
   })
   @ApiParam({
     name: 'id',

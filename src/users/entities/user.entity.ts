@@ -15,7 +15,7 @@ export enum UserRole {
 }
 
 @Entity()
-export class User {
+export class Users {
   @ApiProperty({
     example: 'b7e5b4b2-70d7-4a48-b4ea-0f79df6d71e',
   })

@@ -8,7 +8,7 @@ import {
 
 import { ApiProperty } from '@nestjs/swagger';
 
-import { User } from '../../users/entities/user.entity';
+import { Users } from '../../users/entities/user.entity';
 
 export enum LoanStatus {
   PENDING = 'PENDING',
@@ -53,8 +53,8 @@ export class Loan {
   })
   status!: LoanStatus;
 
-  @ManyToOne(() => User)
-  user!: User;
+  @ManyToOne(() => Users)
+  user!: Users;
 
   @ApiProperty()
   @CreateDateColumn()

@@ -20,7 +20,7 @@ export const getTypeOrmConfig = () => ({
 
   migrations: ['dist/database/migrations/*.js'],
 
-  synchronize: true,
+  synchronize: false,
 });
 
 export const AppDataSource = new DataSource({
@@ -40,5 +40,5 @@ export const AppDataSource = new DataSource({
 
   migrations: ['src/database/migrations/*.ts'],
 
-  synchronize: true,
+  synchronize: false,
 });

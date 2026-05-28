@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import { Loan, LoanStatus } from './entities/loan.entity';
 
-import { User } from '../users/entities/user.entity';
+import { Users } from '../users/entities/user.entity';
 import { CreateLoanDto } from './dto/create-loan.dto';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class LoansService {
     @InjectRepository(Loan)
     private readonly loanRepository: Repository<Loan>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Users)
+    private readonly userRepository: Repository<Users>,
   ) {}
 
   async create(userId: string, body: CreateLoanDto) {
