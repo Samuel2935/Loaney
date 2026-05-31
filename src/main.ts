@@ -26,8 +26,27 @@ async function bootstrap() {
   //   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   //   credentials: true,
   // });
+  // app.enableCors({
+  //   origin: process.env.CORS_ORIGIN?.split(','),
+  //   credentials: true,
+  // });
+  const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
+
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(','),
+    origin: (origin, callback) => {
+      // allow server-to-server / mobile apps (no origin)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+      if (!origin) return callback(null, true);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      if (allowedOrigins.includes(origin)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+        return callback(null, true);
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   });
   // Swagger Configuration
