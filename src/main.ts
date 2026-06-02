@@ -21,34 +21,11 @@ async function bootstrap() {
   );
   //  Enable CORS for all origins (you can restrict this in production)
 
-  // app.enableCors({
-  //   origin: '*', // tighten later
-  //   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  //   credentials: true,
-  // });
-  // app.enableCors({
-  //   origin: process.env.CORS_ORIGIN?.split(','),
-  //   credentials: true,
-  // });
-  const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
-
   app.enableCors({
-    origin: (origin, callback) => {
-      // allow server-to-server / mobile apps (no origin)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-      if (!origin) return callback(null, true);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      if (allowedOrigins.includes(origin)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-        return callback(null, true);
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-      return callback(new Error('Not allowed by CORS'));
-    },
+    origin: true,
     credentials: true,
   });
+
   // Swagger Configuration
   const config = new DocumentBuilder()
     .setTitle('Loaney API')
