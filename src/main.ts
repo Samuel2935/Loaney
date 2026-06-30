@@ -3,7 +3,6 @@ dotenv.config();
 
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
@@ -11,7 +10,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Global validation for DTOs
+  // Global validation
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -19,10 +18,10 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  //  Enable CORS for all origins (you can restrict this in production)
 
+  // CORS
   app.enableCors({
-    origin: true,
+    origin: true, // restrict later in production
     credentials: true,
   });
 
@@ -38,13 +37,13 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 5000);
+  // Render / Production Port Binding
+  const port = process.env.PORT || 5000;
 
-  console.log(`API running on http://localhost:${process.env.PORT ?? 5000}`);
+  await app.listen(Number(port), '0.0.0.0');
 
-  console.log(
-    `Swagger docs running on http://localhost:${process.env.PORT ?? 5000}/docs`,
-  );
+  console.log(` API running on port ${port}`);
+  console.log(` Swagger docs available at /docs`);
 }
 
 bootstrap();
