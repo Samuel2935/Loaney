@@ -40,3 +40,13 @@ export const AppDataSource = new DataSource({
 
   synchronize: false,
 });
+
+console.log('DATABASE_URL:', process.env.DATABASE_URL);
+
+const url = new URL(process.env.DATABASE_URL!);
+
+console.log({
+  host: url.hostname,
+  database: url.pathname,
+  username: url.username,
+});
